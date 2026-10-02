@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* ── Design tokens ─────────────────────────────── */
+:root {
+  --bg: #f6f3ec;
+  --surface: #ffffff;
+  --surface-2: #efebe2;
+  --ink: #1d1b17;
+  --muted: #5c574d;
+  --line: #ddd6c8;
+  --accent: #0b6b5a;
+  --accent-hover: #095a4c;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefe8;
+  --wait: #8a4b00;
+  --wait-soft: #fbecd5;
+  --danger: #b42318;
+  --danger-soft: #fde5e2;
+  --ring: #0b6b5a;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151412;
+    --surface: #1f1d1a;
+    --surface-2: #2a2723;
+    --ink: #f3efe6;
+    --muted: #b3ac9e;
+    --line: #3a3630;
+    --accent: #4fc1a6;
+    --accent-hover: #6fd3bb;
+    --accent-ink: #0d1f1a;
+    --accent-soft: #173a32;
+    --wait: #f2b55e;
+    --wait-soft: #3a2a14;
+    --danger: #ff8a7d;
+    --danger-soft: #3d1c18;
+    --ring: #6fd3bb;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-wait: var(--wait);
+  --color-wait-soft: var(--wait-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0px, var(--surface) 160px, var(--surface-2) 320px);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .25s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* SweetAlert2 ให้เข้ากับธีม */
+.swal2-popup { font-family: var(--font-sans) !important; border-radius: 16px !important; background: var(--surface) !important; color: var(--ink) !important; }
+.swal2-title, .swal2-html-container { color: var(--ink) !important; }
+.swal2-input { background: var(--bg) !important; color: var(--ink) !important; border: 1px solid var(--line) !important; border-radius: 10px !important; }
