@@ -316,10 +316,11 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
               )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <input ref={fileRef} id="cover-file" type="file" accept="image/*" className="sr-only" onChange={(e) => handleFile(e.target.files[0])} />
-              <label htmlFor="cover-file" className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-3 text-sm font-semibold hover:border-accent has-[:focus-visible]:outline-3">
+              <input ref={fileRef} type="file" accept="image/*" hidden tabIndex={-1} onChange={(e) => handleFile(e.target.files?.[0])} />
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={processing}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-3 text-sm font-semibold text-ink hover:border-accent disabled:opacity-60">
                 <ImagePlus size={18} /> เลือกรูปจากเครื่อง
-              </label>
+              </button>
               <input
                 id="cover-url"
                 type="url"
