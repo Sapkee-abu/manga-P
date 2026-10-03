@@ -236,119 +236,155 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
   const ep = form.episodes === '' ? '' : Number(form.episodes);
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-line bg-surface p-5 sm:p-6" noValidate>
-      <div className="flex items-start justify-between gap-3">
-        <h2 className="text-lg font-semibold">{editing ? 'แก้ไขข้อมูล' : 'เพิ่มเรื่องใหม่'}</h2>
+    <form onSubmit={onSubmit} className="overflow-hidden rounded-3xl border border-line bg-surface" noValidate>
+      {/* หัวฟอร์ม */}
+      <div className={`flex items-start justify-between gap-3 border-b border-line px-5 py-4 sm:px-6 ${editing ? 'bg-accent-soft' : 'bg-surface-2'}`}>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-ink">
+            {editing ? <Pencil size={18} /> : <Plus size={20} />}
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold leading-tight">{editing ? 'แก้ไขข้อมูล' : 'เพิ่มเรื่องใหม่'}</h2>
+            <p className="truncate text-sm text-muted">{editing ? form.title || 'ไม่มีชื่อเรื่อง' : 'กรอกข้อมูลแล้วกดเพิ่มเข้าคลัง'}</p>
+          </div>
+        </div>
         {editing && (
-          <button type="button" onClick={onCancel} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-ink">
-            <X size={16} /> ยกเลิก
+          <button type="button" onClick={onCancel} aria-label="ยกเลิกการแก้ไข" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface hover:text-ink">
+            <X size={18} />
           </button>
         )}
       </div>
 
-      <fieldset>
-        <legend className="mb-2 text-sm font-semibold">สถานะ</legend>
-        <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
-          {[['read', 'อ่านแล้ว / กำลังอ่าน'], ['unread', 'รออ่าน']].map(([v, label]) => (
-            <label key={v} className={`cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-semibold transition sm:text-base has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent ${form.status === v ? 'bg-surface text-ink shadow-sm' : 'text-muted'}`}>
-              <input type="radio" name="status" value={v} checked={form.status === v} className="sr-only"
-                onChange={() => set(v === 'unread' ? { status: v, episodes: '' } : { status: v })} />
-              {label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <Field label="ชื่อเรื่อง" required>
-        <input type="text" value={form.title} onChange={(e) => set({ title: e.target.value })} className={inputCls} autoComplete="off" />
-      </Field>
-
-      <div>
-        <span className="mb-2 block text-sm font-semibold">รูปปก <span className="text-danger">*</span></span>
-        <div className="flex gap-4">
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
-            className={`relative w-28 shrink-0 overflow-hidden rounded-xl border-2 border-dashed sm:w-32 ${dragOver ? 'border-accent bg-accent-soft' : 'border-line'}`}
-          >
-            {form.cover ? (
-              <img src={coverSrc(form.cover)} alt="ตัวอย่างรูปปก" className="aspect-[3/4] w-full object-cover" />
-            ) : (
-              <div className="flex aspect-[3/4] flex-col items-center justify-center gap-1 p-2 text-center text-xs text-muted">
-                <ImagePlus size={24} /> ลากรูปมาวาง
-              </div>
-            )}
-            {processing && (
-              <div className="absolute inset-0 flex items-center justify-center bg-surface/80"><Loader2 className="animate-spin" /></div>
-            )}
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <input ref={fileRef} id="cover-file" type="file" accept="image/*" className="sr-only" onChange={(e) => handleFile(e.target.files[0])} />
-            <label htmlFor="cover-file" className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-3 font-semibold hover:border-accent has-[:focus-visible]:outline-3">
-              <ImagePlus size={18} /> เลือกรูปจากเครื่อง
-            </label>
-            <label className="text-sm text-muted" htmlFor="cover-url">หรือวางลิงก์รูป</label>
-            <input
-              id="cover-url"
-              type="url"
-              inputMode="url"
-              placeholder="https://…"
-              value={isUploaded(form.cover) ? '' : form.cover}
-              onChange={(e) => set({ cover: e.target.value })}
-              className={inputCls}
-            />
-            {form.cover && (
-              <button type="button" onClick={() => set({ cover: '' })} className="self-start text-sm font-semibold text-danger underline underline-offset-4">
-                ลบรูป
-              </button>
-            )}
-            <p className="text-xs text-muted">รูปจะถูกย่ออัตโนมัติก่อนบันทึก ไม่ทำให้ฐานข้อมูลอืด</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {form.status === 'read' ? (
-          <Field label="อ่านถึงตอนที่" required>
-            <div className="flex">
-              <button type="button" aria-label="ลดตอน" onClick={() => set({ episodes: Math.max(0, (Number(ep) || 0) - 1) })}
-                className="h-12 w-11 shrink-0 rounded-l-xl border border-r-0 border-line bg-surface-2 hover:text-accent"><Minus size={18} className="mx-auto" /></button>
-              <input type="number" min="0" inputMode="numeric" value={form.episodes} onChange={(e) => set({ episodes: e.target.value })}
-                className="h-12 w-full min-w-0 border border-line bg-bg px-2 text-center text-lg font-semibold text-ink focus:border-accent focus:outline-none" />
-              <button type="button" aria-label="เพิ่มตอน" onClick={() => set({ episodes: (Number(ep) || 0) + 1 })}
-                className="h-12 w-11 shrink-0 rounded-r-xl border border-l-0 border-line bg-surface-2 hover:text-accent"><Plus size={18} className="mx-auto" /></button>
+      <div className="divide-y divide-line">
+        {/* ── ข้อมูลหลัก ── */}
+        <Section title="ข้อมูลหลัก">
+          <fieldset>
+            <legend className={labelCls}>สถานะ</legend>
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
+              {[['read', 'อ่านแล้ว'], ['unread', 'รออ่าน']].map(([v, label]) => (
+                <label key={v} className={`cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-semibold transition has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent ${form.status === v ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'}`}>
+                  <input type="radio" name="status" value={v} checked={form.status === v} className="sr-only"
+                    onChange={() => set(v === 'unread' ? { status: v, episodes: '' } : { status: v })} />
+                  {label}
+                </label>
+              ))}
             </div>
+          </fieldset>
+
+          <Field label="ชื่อเรื่อง" required>
+            <input type="text" value={form.title} onChange={(e) => set({ title: e.target.value })} placeholder="เช่น Solo Leveling" className={inputCls} autoComplete="off" />
           </Field>
-        ) : null}
-        <Field label="หมวดหมู่" className={form.status === 'unread' ? 'col-span-2' : ''}>
-          <select value={form.category} onChange={(e) => set({ category: e.target.value })} className={inputCls}>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </Field>
+
+          <Field label="หมวดหมู่">
+            <select value={form.category} onChange={(e) => set({ category: e.target.value })} className={inputCls}>
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </Field>
+
+          {form.status === 'read' && (
+            <Field label="อ่านถึงตอนที่" required>
+              <div className="flex">
+                <button type="button" aria-label="ลดตอน" onClick={() => set({ episodes: Math.max(0, (Number(ep) || 0) - 1) })}
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-l-xl border border-r-0 border-line bg-surface-2 hover:text-accent"><Minus size={18} /></button>
+                <input type="number" min="0" inputMode="numeric" value={form.episodes} placeholder="0" onChange={(e) => set({ episodes: e.target.value })}
+                  className="h-12 w-full min-w-0 border border-line bg-bg px-2 text-center text-lg font-bold text-ink focus:border-accent focus:outline-none" />
+                <button type="button" aria-label="เพิ่มตอน" onClick={() => set({ episodes: (Number(ep) || 0) + 1 })}
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-r-xl border border-l-0 border-line bg-surface-2 hover:text-accent"><Plus size={18} /></button>
+              </div>
+            </Field>
+          )}
+        </Section>
+
+        {/* ── รูปปก ── */}
+        <Section title="รูปปก" required>
+          <div className="flex gap-4">
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+              className={`relative w-24 shrink-0 overflow-hidden rounded-xl border-2 border-dashed sm:w-28 ${dragOver ? 'border-accent bg-accent-soft' : 'border-line'}`}
+            >
+              {form.cover ? (
+                <img src={coverSrc(form.cover)} alt="ตัวอย่างรูปปก" className="aspect-[3/4] w-full object-cover" />
+              ) : (
+                <div className="flex aspect-[3/4] flex-col items-center justify-center gap-1 p-2 text-center text-xs text-muted">
+                  <ImagePlus size={22} /> ลากรูปมาวาง
+                </div>
+              )}
+              {processing && (
+                <div className="absolute inset-0 flex items-center justify-center bg-surface/80"><Loader2 className="animate-spin" /></div>
+              )}
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <input ref={fileRef} id="cover-file" type="file" accept="image/*" className="sr-only" onChange={(e) => handleFile(e.target.files[0])} />
+              <label htmlFor="cover-file" className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-3 text-sm font-semibold hover:border-accent has-[:focus-visible]:outline-3">
+                <ImagePlus size={18} /> เลือกรูปจากเครื่อง
+              </label>
+              <input
+                id="cover-url"
+                type="url"
+                inputMode="url"
+                aria-label="ลิงก์รูปปก"
+                placeholder="หรือวางลิงก์รูป https://…"
+                value={isUploaded(form.cover) ? '' : form.cover}
+                onChange={(e) => set({ cover: e.target.value })}
+                className={`${inputCls} h-11 text-sm`}
+              />
+              {form.cover && (
+                <button type="button" onClick={() => set({ cover: '' })} className="inline-flex items-center gap-1 self-start text-sm font-semibold text-danger hover:underline">
+                  <Trash2 size={14} /> ลบรูป
+                </button>
+              )}
+            </div>
+          </div>
+          <p className={hintCls}>รูปจะถูกย่ออัตโนมัติก่อนบันทึก ไม่ทำให้ฐานข้อมูลอืด</p>
+        </Section>
+
+        {/* ── เรื่องย่อ ── */}
+        <Section title="เรื่องย่อ" hint="ไม่บังคับ">
+          <textarea rows={4} value={form.description} onChange={(e) => set({ description: e.target.value })} placeholder="สรุปเนื้อเรื่องสั้นๆ…" aria-label="เรื่องย่อ" className={`${inputCls} h-auto py-3 leading-relaxed`} />
+        </Section>
       </div>
 
-      <Field label="เรื่องย่อ (ไม่บังคับ)">
-        <textarea rows={4} value={form.description} onChange={(e) => set({ description: e.target.value })} className={`${inputCls} h-auto py-3`} />
-      </Field>
-
-      <button type="submit" disabled={saving || processing}
-        className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-base font-semibold text-accent-ink transition hover:bg-accent-hover disabled:opacity-60">
-        {saving && <Loader2 className="animate-spin" size={20} />}
-        {saving ? 'กำลังบันทึก…' : editing ? 'บันทึกการแก้ไข' : 'เพิ่มเข้าคลัง'}
-      </button>
+      {/* ปุ่มบันทึก */}
+      <div className="flex gap-2 border-t border-line bg-surface-2 px-5 py-4 sm:px-6">
+        {editing && (
+          <button type="button" onClick={onCancel} className="h-12 rounded-xl border border-line bg-surface px-5 text-base font-semibold text-ink hover:border-accent">
+            ยกเลิก
+          </button>
+        )}
+        <button type="submit" disabled={saving || processing}
+          className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-5 text-base font-semibold text-accent-ink transition hover:bg-accent-hover disabled:opacity-60">
+          {saving && <Loader2 className="animate-spin" size={20} />}
+          {saving ? 'กำลังบันทึก…' : editing ? 'บันทึกการแก้ไข' : 'เพิ่มเข้าคลัง'}
+        </button>
+      </div>
     </form>
   );
 }
 
 /* ───────────────────────── Bits ───────────────────────── */
 
-const inputCls = 'h-12 w-full rounded-xl border border-line bg-bg px-4 text-base text-ink placeholder:text-muted focus:border-accent focus:outline-none';
+const inputCls = 'h-12 w-full rounded-xl border border-line bg-bg px-4 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none';
+const labelCls = 'mb-1.5 block text-sm font-medium text-ink';
+const hintCls = 'text-xs text-muted';
+
+function Section({ title, required, hint, children }) {
+  return (
+    <section className="space-y-4 px-5 py-5 sm:px-6">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
+        {title} {required && <span className="text-danger">*</span>}
+        {hint && <span className="ml-1 font-normal normal-case tracking-normal">({hint})</span>}
+      </h3>
+      {children}
+    </section>
+  );
+}
 
 function Field({ label, required, className = '', children }) {
   return (
     <label className={`block ${className}`}>
-      <span className="mb-2 block text-sm font-semibold">
+      <span className={labelCls}>
         {label} {required && <span className="text-danger">*</span>}
       </span>
       {children}

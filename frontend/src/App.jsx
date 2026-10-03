@@ -200,9 +200,9 @@ export default function App() {
         </button>
       )}
 
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-20 z-50 flex justify-center px-4">
         {toast && (
-          <div key={toast.key} className="rise pointer-events-auto flex items-center gap-2 rounded-xl bg-ink px-4 py-3 font-medium text-bg shadow-xl">
+          <div key={toast.key} className="drop pointer-events-auto flex max-w-md items-center gap-2 rounded-xl bg-ink px-4 py-3 text-sm font-medium text-bg shadow-xl">
             {toast.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
             {toast.message}
           </div>
