@@ -12,23 +12,23 @@ export default function MangaCard({ manga, onOpen }) {
     >
       <Cover src={manga.cover} alt="" className="aspect-[3/4] w-full" />
 
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
-        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-ink">{manga.title}</h3>
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-accent">{manga.category}</p>
+        <h3 className="mb-3 mt-1 line-clamp-2 text-base font-semibold leading-snug text-ink">{manga.title}</h3>
 
-        <p className="text-sm text-muted">{manga.category}</p>
-
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1">
+        {/* ตอน และวันเวลา แยกคนละบรรทัด */}
+        <div className="mt-auto flex flex-col items-start gap-1 border-t border-line pt-3">
           {unread ? (
-            <span className="rounded-full bg-wait-soft px-2.5 py-1 text-sm font-semibold text-wait">รออ่าน</span>
+            <span className="rounded-full bg-wait-soft px-2.5 py-0.5 text-sm font-semibold text-wait">รออ่าน</span>
           ) : (
             <span className="text-sm text-muted">
-              ตอนที่ <strong className="text-lg font-bold text-accent">{manga.episodes ?? 0}</strong>
+              ตอนที่ <strong className="text-base font-bold text-accent">{manga.episodes ?? 0}</strong>
             </span>
           )}
           <time
             dateTime={manga.updatedAt ? new Date(manga.updatedAt).toISOString() : undefined}
             title={formatDate(manga.updatedAt || manga.createdAt)}
-            className="whitespace-nowrap text-xs text-muted"
+            className="text-xs text-muted"
           >
             {timeAgo(manga.updatedAt || manga.createdAt)}
           </time>

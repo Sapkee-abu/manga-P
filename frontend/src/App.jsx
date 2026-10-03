@@ -7,6 +7,7 @@ import { api, mangaId, readCache, writeCache } from './lib/api';
 import { Alert as Swal } from './lib/alert';
 
 const SESSION_MS = 10 * 60 * 1000;
+const headerBtn = 'inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-line bg-surface px-3 text-sm font-semibold hover:border-accent sm:px-4';
 
 export default function App() {
   const [view, setView] = useState('user'); // user | detail | admin
@@ -159,22 +160,22 @@ export default function App() {
 
       <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-          <button onClick={() => (view === 'admin' ? null : backToList())} className="flex items-center gap-2.5 rounded-lg text-left" aria-label="Manhwa Secret หน้าแรก">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent text-accent-ink">
+          <button onClick={() => (view === 'admin' ? null : backToList())} className="flex min-w-0 items-center gap-2.5 rounded-lg text-left" aria-label="Manhwa Secret หน้าแรก">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent text-accent-ink">
               <Library size={20} />
             </span>
-            <span className="leading-tight">
-              <span className="block text-lg font-bold">Manhwa Secret</span>
-              <span className="block text-xs text-muted">บันทึกการอ่านของฉัน</span>
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-base font-bold sm:text-lg">Manhwa Secret</span>
+              <span className="block truncate text-xs text-muted">{view === 'admin' ? 'โหมดผู้ดูแล' : 'บันทึกการอ่านของฉัน'}</span>
             </span>
           </button>
 
           {view === 'admin' ? (
-            <button onClick={exitAdmin} className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-surface px-4 font-semibold hover:border-accent">
-              <LogOut size={18} /> <span>ออกจากผู้ดูแล</span>
+            <button onClick={exitAdmin} aria-label="ออกจากโหมดผู้ดูแล" className={headerBtn}>
+              <LogOut size={18} /> <span className="hidden sm:inline">ออกจากผู้ดูแล</span><span className="sm:hidden">ออก</span>
             </button>
           ) : (
-            <button onClick={enterAdmin} className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-surface px-4 font-semibold hover:border-accent">
+            <button onClick={enterAdmin} className={headerBtn}>
               <Lock size={18} /> <span>ผู้ดูแล</span>
             </button>
           )}

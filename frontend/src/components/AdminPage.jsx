@@ -117,25 +117,26 @@ export default function AdminPage({ mangas, onAdd, onUpdate, onDelete }) {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
+      <header className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold">จัดการคลังมังงะ</h1>
-          <p className="text-muted">เพิ่ม แก้ไข หรืออัปเดตตอนที่อ่านถึง</p>
+          <h1 className="text-2xl font-bold leading-tight sm:text-3xl">จัดการคลังมังงะ</h1>
+          <p className="mt-1 text-sm text-muted sm:text-base">เพิ่ม แก้ไข หรืออัปเดตตอนที่อ่านถึง</p>
         </div>
         {mode !== 'edit' && (
-          <div role="tablist" className="grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1">
+          <div role="tablist" className="grid w-full grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1 sm:w-auto sm:max-w-md">
             {[
-              ['add', 'เพิ่มเรื่องใหม่'],
-              ['list', `รายการทั้งหมด (${mangas.length})`],
-            ].map(([k, label]) => (
+              ['add', 'เพิ่มเรื่องใหม่', null],
+              ['list', 'รายการทั้งหมด', mangas.length],
+            ].map(([k, label, count]) => (
               <button
                 key={k}
                 role="tab"
                 aria-selected={mode === k}
                 onClick={() => { setMode(k); setForm(EMPTY); }}
-                className={`rounded-xl px-4 py-2.5 font-semibold transition ${mode === k ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'}`}
+                className={`rounded-xl px-3 py-2.5 text-sm font-semibold transition sm:text-base ${mode === k ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'}`}
               >
                 {label}
+                {count !== null && <span className="ml-1 font-normal text-muted">({count})</span>}
               </button>
             ))}
           </div>
@@ -148,10 +149,12 @@ export default function AdminPage({ mangas, onAdd, onUpdate, onDelete }) {
 
           {mode === 'add' && (
             <section aria-labelledby="recent-h" className="space-y-3">
-              <h2 id="recent-h" className="flex items-center gap-2 font-semibold">
-                <Clock size={18} className="text-accent" /> เพิ่งเพิ่มล่าสุด
-                <span className="text-sm font-normal text-muted">(ซ่อนอัตโนมัติหลัง 10 นาที)</span>
-              </h2>
+              <div>
+                <h2 id="recent-h" className="flex items-center gap-2 text-lg font-semibold">
+                  <Clock size={18} className="text-accent" /> เพิ่งเพิ่มล่าสุด
+                </h2>
+                <p className="text-sm text-muted">ซ่อนอัตโนมัติหลัง 10 นาที</p>
+              </div>
               {recent.length === 0 ? (
                 <div className="rounded-2xl border-2 border-dashed border-line px-6 py-10 text-center text-muted">
                   เรื่องที่เพิ่งเพิ่มจะแสดงที่นี่
@@ -235,7 +238,7 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
   return (
     <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-line bg-surface p-5 sm:p-6" noValidate>
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-xl font-bold">{editing ? 'แก้ไขข้อมูล' : 'เพิ่มเรื่องใหม่'}</h2>
+        <h2 className="text-lg font-semibold">{editing ? 'แก้ไขข้อมูล' : 'เพิ่มเรื่องใหม่'}</h2>
         {editing && (
           <button type="button" onClick={onCancel} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-ink">
             <X size={16} /> ยกเลิก
@@ -247,7 +250,7 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
         <legend className="mb-2 text-sm font-semibold">สถานะ</legend>
         <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
           {[['read', 'อ่านแล้ว / กำลังอ่าน'], ['unread', 'รออ่าน']].map(([v, label]) => (
-            <label key={v} className={`cursor-pointer rounded-lg px-3 py-2 text-center font-semibold transition has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent ${form.status === v ? 'bg-surface text-ink shadow-sm' : 'text-muted'}`}>
+            <label key={v} className={`cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-semibold transition sm:text-base has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent ${form.status === v ? 'bg-surface text-ink shadow-sm' : 'text-muted'}`}>
               <input type="radio" name="status" value={v} checked={form.status === v} className="sr-only"
                 onChange={() => set(v === 'unread' ? { status: v, episodes: '' } : { status: v })} />
               {label}
@@ -330,7 +333,7 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
       </Field>
 
       <button type="submit" disabled={saving || processing}
-        className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-lg font-semibold text-accent-ink transition hover:bg-accent-hover disabled:opacity-60">
+        className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-base font-semibold text-accent-ink transition hover:bg-accent-hover disabled:opacity-60">
         {saving && <Loader2 className="animate-spin" size={20} />}
         {saving ? 'กำลังบันทึก…' : editing ? 'บันทึกการแก้ไข' : 'เพิ่มเข้าคลัง'}
       </button>
@@ -371,18 +374,18 @@ function Row({ manga, onEdit, onDelete, onBump }) {
   const bump = async () => { setBusy(true); await onBump(); setBusy(false); };
 
   return (
-    <li id={`manga-${mangaId(manga)}`} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-2.5 pr-3 transition sm:gap-4">
+    <li id={`manga-${mangaId(manga)}`} className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 rounded-2xl border border-line bg-surface p-3 transition sm:grid-cols-[auto_1fr_auto] sm:gap-x-4">
       <Cover src={manga.cover} alt="" className="aspect-[3/4] w-14 shrink-0 rounded-lg sm:w-16" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold">{manga.title}</p>
-        <p className="text-sm text-muted">
-          {manga.category} · {timeAgo(manga.updatedAt || manga.createdAt)}
+      <div className="min-w-0">
+        <p className="text-xs font-medium uppercase tracking-wide text-accent">{manga.category}</p>
+        <p className="truncate text-base font-semibold leading-snug">{manga.title}</p>
+        {/* ตอน และวันเวลา แยกคนละบรรทัด */}
+        <p className="mt-1 text-sm">
+          {unread ? <span className="font-semibold text-wait">รออ่าน</span> : <span className="text-muted">ตอนที่ <strong className="text-accent">{manga.episodes ?? 0}</strong></span>}
         </p>
-        <p className="mt-0.5 text-sm">
-          {unread ? <span className="font-semibold text-wait">รออ่าน</span> : <>ตอนที่ <strong className="text-accent">{manga.episodes ?? 0}</strong></>}
-        </p>
+        <p className="text-xs text-muted">{timeAgo(manga.updatedAt || manga.createdAt)}</p>
       </div>
-      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+      <div className="col-span-2 flex items-center justify-end gap-1 border-t border-line pt-2 sm:col-span-1 sm:border-0 sm:pt-0 sm:gap-2">
         <button onClick={bump} disabled={busy} title="อ่านเพิ่ม 1 ตอน"
           className="inline-flex h-10 items-center gap-1 rounded-xl bg-accent-soft px-3 text-sm font-semibold text-accent hover:bg-accent hover:text-accent-ink disabled:opacity-60">
           {busy ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}<span>1 ตอน</span>
