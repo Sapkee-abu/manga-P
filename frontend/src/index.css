@@ -74,6 +74,22 @@ body {
   border-radius: 8px;
 }
 
+/* ── ความรู้สึกตอนกดปุ่ม: ยุบลงเล็กน้อย + มืดลงนิดหนึ่ง ── */
+button, [role="tab"], .press {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition-property: transform, translate, scale, filter, background-color, border-color, color, box-shadow, opacity;
+  transition-duration: .15s;
+  transition-timing-function: cubic-bezier(.2, .8, .2, 1);
+}
+button:not(:disabled):active,
+[role="tab"]:active,
+.press:has(:active) {
+  transform: scale(.96);
+  filter: brightness(.94);
+  transition-duration: .06s;
+}
+
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 

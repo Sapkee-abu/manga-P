@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus, Minus, Trash2, Pencil, ImagePlus, X, Search, Loader2, Clock } from 'lucide-react';
 import { Alert as Swal } from '../lib/alert';
 import Cover from './Cover';
@@ -211,7 +211,9 @@ export default function AdminPage({ mangas, onAdd, onUpdate, onDelete }) {
 /* ───────────────────────── Form ───────────────────────── */
 
 function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
-  const fileRef = useRef(null);
+  // เปลี่ยน key ทุกครั้งที่เลือกรูปเสร็จ → React สร้าง <input type="file"> ตัวใหม่
+  // Chrome บน Android บางเครื่องเปิดตัวเลือกรูปจาก input ตัวเดิมซ้ำไม่ได้
+  const [fileKey, setFileKey] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
@@ -229,7 +231,7 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
       );
     } finally {
       setProcessing(false);
-      if (fileRef.current) fileRef.current.value = '';
+      setFileKey((k) => k + 1);
     }
   };
 
@@ -316,11 +318,21 @@ function MangaForm({ form, setForm, editing, saving, onSubmit, onCancel }) {
               )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <input ref={fileRef} type="file" accept="image/*" hidden tabIndex={-1} onChange={(e) => handleFile(e.target.files?.[0])} />
-              <button type="button" onClick={() => fileRef.current?.click()} disabled={processing}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-3 text-sm font-semibold text-ink hover:border-accent disabled:opacity-60">
-                <ImagePlus size={18} /> เลือกรูปจากเครื่อง
-              </button>
+              {/* ผู้ใช้แตะ input จริงที่วางทับปุ่มอยู่ (โปร่งใส) ไม่ต้องสั่ง .click() ผ่าน JS */}
+              <div className={`press relative inline-flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl border border-line bg-surface-2 px-3 text-sm font-semibold text-ink hover:border-accent has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent ${processing ? 'pointer-events-none opacity-60' : ''}`}>
+                {processing ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
+                {processing ? 'กำลังย่อรูป…' : 'เลือกรูปจากเครื่อง'}
+                <input
+                  key={fileKey}
+                  type="file"
+                  accept="image/*"
+                  aria-label="เลือกรูปจากเครื่อง"
+                  disabled={processing}
+                  onClick={() => navigator.vibrate?.(10)}
+                  onChange={(e) => handleFile(e.target.files?.[0])}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                />
+              </div>
               <input
                 id="cover-url"
                 type="url"
